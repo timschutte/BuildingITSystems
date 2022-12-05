@@ -12,6 +12,7 @@ class Appointment(models.Model):
         return self.name
     
 class User(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     teams = models.ManyToManyField(Team, through='Membership')
     email = models.EmailField()
@@ -26,3 +27,10 @@ class Team(models.Model):
     description = models.TextField()
     def __str__(self):
         return self.name
+
+def findAppointments(start, end, user):
+    return Appointment.objects.get('SELECT * FROM Appointment WHERE (start_time BETWEEN start AND end) OR (end_time BETWEEN start AND end) AND user = user;')
+
+def findAvailability(start, end, name):
+    users = Appointment.objects.get('SELECT members FROM Team WHERE name = name;')
+    
