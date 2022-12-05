@@ -4,4 +4,5 @@ def login(response):
     pass
 
 def home(response):
-    pass
+    return render(response,"scheduling/index.html")
+    
