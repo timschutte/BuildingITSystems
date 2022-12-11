@@ -4,6 +4,7 @@ from .models import ToDoList, Item
 from .forms import CreateNewList
 # Create views here
 
+
 def index(response, id):
     ls = ToDoList.objects.get(id=id)
     return render(response, "playground/list.html", {"ls": ls})
