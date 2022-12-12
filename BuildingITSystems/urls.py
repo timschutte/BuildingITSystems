@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from register import views as v
+
 # views as v because there might be more views in the future
 
 urlpatterns = [
@@ -23,6 +24,11 @@ urlpatterns = [
     path('register/', v.register, name="register"),
     path('', include("playground.urls")),
     path('', include("django.contrib.auth.urls")),
+    path('general/', ),
+    path('messenger/', ),
+    path('detail_month/', ),
+    path('detail_month_add/', ),
+    path('detail_plan/', ),
 ]
 
 # home/start/

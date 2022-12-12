@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import ToDoList, Item
 from .forms import CreateNewList
@@ -12,6 +12,10 @@ def index(response, id):
 
 def home(response):
     return render(response, "playground/home.html", {})
+
+
+def general(request):
+    return redirect('general.html')
 
 
 # def create(response):
