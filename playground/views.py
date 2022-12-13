@@ -14,8 +14,8 @@ def home(response):
     return render(response, "playground/home.html", {})
 
 
-def general(request):
-    return redirect('general.html')
+def general(response):
+    return render(response, "playground/general.html", {})
 
 
 # def create(response):

@@ -24,11 +24,11 @@ urlpatterns = [
     path('register/', v.register, name="register"),
     path('', include("playground.urls")),
     path('', include("django.contrib.auth.urls")),
-    path('general/', ),
-    path('messenger/', ),
-    path('detail_month/', ),
-    path('detail_month_add/', ),
-    path('detail_plan/', ),
+    # path('general/', general),
+    # path('messenger/', ),
+    # path('detail_month/', ),
+    # path('detail_month_add/', ),
+    # path('detail_plan/', ),
 ]
 
 # home/start/
