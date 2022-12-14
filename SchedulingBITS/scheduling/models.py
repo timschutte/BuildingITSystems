@@ -44,6 +44,25 @@ def createAppointment(name, user: User, start_time: datetime, end_time: datetime
     Appointment.objects.create(name=name, user=user, description=description, start_time=int(datetime.timestamp(start_time)), end_time=int(datetime.timestamp(end_time)), location=location, hyperlink=hyperlink)
 # A function to return all times for a certain user within a certain timeframe
 # Can be used to render a calendar
+
+i_ap ={'id':0, 'name':1, 'description':2, 'end_time':3, 'location':4, 'hyperlink':5, 'user_id':6, 'start_time':7}
+def editAppointment(appointment, name=None, start_time=None, end_time=None, description=None, location=None, hyperlink=None):
+    if name is None:
+        name = appointment[i_ap['name']]
+    if start_time is None:
+        start_time = int(datetime.timestamp(appointment[i_ap['start_time']]))
+    if end_time is None:
+        end_time = int(datetime.timestamp(appointment[i_ap['end_time']]))
+    if hyperlink is None:
+        hyperlink = appointment[i_ap['hyperlink']]
+    if description is None:
+        description = appointment[i_ap['description']]
+    if location is None:
+        location = appointment[i_ap['location']]
+    c = conn.cursor()
+    c.execute('UPDATE scheduling_appointment SET name = ?, start_time = ?, end_time = ?, description = ?, location = ?, hyperlink = ? WHERE id = ?;', (name, start_time, end_time, description, location, hyperlink, appointment.id))
+    c.close()
+
 def returnAppointmentsUser(start_time: datetime, end_time: datetime, user: User, full_ap=False):
     c = conn.cursor()
     try:
@@ -69,7 +88,7 @@ def returnAppointmentsTeam(start_time: datetime, end_time: datetime, team: Team)
     c.close()
     appointments = []
     for user in users:
-        appointments_user = returnAppointments(start_time, end_time, user[0])
+        appointments_user = returnAppointmentsUser(start_time, end_time, user[0])
         if appointments_user != []:
             appointments.append(appointments_user)
     return appointments
