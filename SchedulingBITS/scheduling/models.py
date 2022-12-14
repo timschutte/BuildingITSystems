@@ -44,13 +44,16 @@ def createAppointment(name, user: User, start_time: datetime, end_time: datetime
     Appointment.objects.create(name=name, user=user, description=description, start_time=int(datetime.timestamp(start_time)), end_time=int(datetime.timestamp(end_time)), location=location, hyperlink=hyperlink)
 # A function to return all times for a certain user within a certain timeframe
 # Can be used to render a calendar
-def findAppointments(start_time: datetime, end_time: datetime, user: User):
+def returnAppointmentsUser(start_time: datetime, end_time: datetime, user: User, full_ap=False):
     c = conn.cursor()
     try:
         id = user.id
     except AttributeError:
         id = user
-    c.execute(f'SELECT * FROM scheduling_appointment WHERE ((start_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())}) OR (end_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())})) AND user_id = {id};')
+    if full_ap:
+        c.execute(f'SELECT * FROM scheduling_appointment WHERE ((start_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())}) OR (end_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())})) AND user_id = {int(id)};')
+    else:
+        c.execute(f'SELECT start_time, end_time, user_id FROM scheduling_appointment WHERE ((start_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())}) OR (end_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())})) AND user_id = {int(id)};')
     data = c.fetchall()
     c.close()
     return data
@@ -59,42 +62,48 @@ def findAppointments(start_time: datetime, end_time: datetime, user: User):
 # Can be used for availability checking
 def returnAppointmentsTeam(start_time: datetime, end_time: datetime, team: Team):
     c = conn.cursor()
-    c.execute(f'SELECT start_time, end_time, user_id FROM (SELECT A.start_time, A.end_time, A.user_id FROM scheduling_appointment A, scheduling_membership M WHERE M.user_id = A.user_id AND M.team_id = {team}) WHERE (start_time BETWEEN {start_time.timestamp()} AND {end_time.timestamp()}) OR (end_time BETWEEN {start_time.timestamp()} AND {end_time.timestamp()}) ORDER BY start_time ASC;')
-    data = c.fetchall()
+    #query = f"SELECT start_time, end_time, user_id FROM (SELECT A.start_time , A.end_time, A.user_id  FROM scheduling_appointment A, scheduling_membership M WHERE M.user_id = A.user_id AND M.team_id = {team}) WHERE start_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())} OR end_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())} ORDER BY start_time ASC;"
+    query = f"SELECT user_id from scheduling_membership WHERE team_id = {team};"
+    c.execute(query)
+    users = c.fetchall()
     c.close()
-    return data
+    appointments = []
+    for user in users:
+        appointments_user = returnAppointments(start_time, end_time, user[0])
+        if appointments_user != []:
+            appointments.append(appointments_user)
+    return appointments
 
-######## The sorting is done by indexing the starting time! IF ANYTHING CHANGES TO THE COLUMN ORDER OF THE APPOINTMENTS TABLE, THIS WILL BREAK
-# In that case i_start and i_end need to be adjusted accordingly ########
+
+def deleteOverlap(appointments):
+    for i in range(len(appointments)-1, 0, -1):
+        if appointments[i][i_start] <= appointments[i-1][i_end]:
+            appointments[i-1] = (appointments[i-1][i_start], max(appointments[i][i_end], appointments[i-1][i_end]), appointments[i-1][-1])
+            del appointments[i]
+    return appointments
+            
 i_start = 0
 i_end = 1
-def availabilityPercentage(start_time: datetime, end_time: datetime, team: Team):
-    sorted_ap = returnAppointmentsTeam(start_time, end_time, team) # sorted appointments
-    team_percentage = 1 / Membership.objects.filter(team=team).count() # The percentage of the team one team member represents
-    availability = [[time, 1] for time in range(int(start_time.timestamp()) - int(start_time.timestamp()) % 900, int(end_time.timestamp()) - int(end_time.timestamp()) % 900, 900)] # The time interval buckets of 15 minute intervals with initialized percentage of avialability
-    # The following two loops are to make sure that the appointments are within the timeframe
-    for i in range(len(sorted_ap)):
-        if sorted_ap[i][i_start] < start_time.timestamp():
-            sorted_ap[i][i_start] = start_time.timestamp()
-        else:
-            break
-
-    for i in range(len(sorted_ap) -1 , -1, -1):
-        if sorted_ap[i][i_end] > end_time.timestamp():
-            sorted_ap[i][i_end] = end_time.timestamp()
+def substractAvailabilityUser(availability, appointments, team_percentage):
     latest_timebucket = 0
-
-    for i in range(len(sorted_ap)):
+    for i in range(len(appointments)):
         for i1 in range(latest_timebucket, len(availability)):
-            ###### Just realized that if someone has two overlapping appointments, this will lower the availability twice. 
-            if sorted_ap[i][i_start] < availability[i1][0]+900:
-                if sorted_ap[i][i_end] > availability[i1][0]:
+            if appointments[i][i_start] < availability[i1][0]+900:
+                if appointments[i][i_end] > availability[i1][0]:
                     availability[i1][1] -= team_percentage
-            elif sorted_ap[i][i_start] >= availability[i1][0] + 900: # For shortening outer loop for runtime performance
+            elif appointments[i][i_start] >= availability[i1][0] + 900: # For shortening outer loop for runtime performance
                 latest_timebucket = i1 + 1
                 continue
-            elif sorted_ap[i][i_end] <= availability[i1][0]: # For cutting loops of short if possible for runtime performance
+            elif appointments[i][i_end] <= availability[i1][0]: # For cutting loops of short if possible for runtime performance
                 break
     return availability
 
 
+def availabilityPercentageTeam(start_time: datetime, end_time: datetime, team: Team): 
+    team_percentage = 1 / Membership.objects.filter(team=team).count() # The percentage of the team one team member represents
+    availability = [[time, 1] for time in range(int(start_time.timestamp()) - int(start_time.timestamp()) % 900, int(end_time.timestamp()) - int(end_time.timestamp()) % 900, 900)] # The time interval buckets of 15 minute intervals with initialized percentage of avialability
+    appointments_team = returnAppointmentsTeam(start_time, end_time, team)
+    for appointments_user in appointments_team:
+        appointments_user = deleteOverlap(appointments_user)
+        availability = substractAvailabilityUser(availability, appointments_user, team_percentage)
+    return availability
