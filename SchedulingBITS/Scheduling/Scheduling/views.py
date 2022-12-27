@@ -17,3 +17,22 @@ def schedule(request):
 
 def about(request):
     return render(request, 'about.html')
+   
+def login(request):
+    return render(request, 'Scheduling/login.html')
+
+def test(request):
+    return render(request, 'Scheduling/test.html')
+
+def footer(request):
+    return render(request, 'Scheduling/footer.html')
+
+def register(response):
+    if response.method == "POST":
+        form = RegisterForm(response.POST)
+        if form.is_valid():
+            form.save()
+        return redirect("/home")
+    else:
+        form = RegisterForm()
+    return render(response, "register/register.html", {"form": form})
