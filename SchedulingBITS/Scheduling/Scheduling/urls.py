@@ -26,5 +26,9 @@ urlpatterns = [
     path('schedule',views.schedule, name="schedule"),
     path('messages',views.messages, name="messages"),
     path('about',views.about, name="about"),
+    path('login', views.login, name='login'),
+    path('register/', v.register, name="register"),
+    path('test', views.test, name="test"),
+    path('footer', views.footer, name="footer"),
 
 ]
