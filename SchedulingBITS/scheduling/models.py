@@ -63,7 +63,7 @@ def editAppointment(appointment, name=None, start_time=None, end_time=None, desc
     c.execute('UPDATE scheduling_appointment SET name = ?, start_time = ?, end_time = ?, description = ?, location = ?, hyperlink = ? WHERE id = ?;', (name, start_time, end_time, description, location, hyperlink, appointment.id))
     c.close()
 
-def returnAppointmentsUser(start_time: datetime, end_time: datetime, user: User, full_ap=False):
+def returnAppointmentsUser(start_time: datetime, end_time: datetime, user, full_ap=False):
     c = conn.cursor()
     try:
         id = user.id
