@@ -2,7 +2,7 @@ from django.db import models
 from datetime import datetime, timedelta
 import sqlite3
 from django.conf import settings
-settings.configure()
+
 
 class User(models.Model):
     id = models.AutoField(primary_key=True)
@@ -39,7 +39,7 @@ class Membership(models.Model):
 
 
 
-conn = sqlite3.connect('db.sqlite3')
+
 
 def createAppointment(name, user: User, start_time: datetime, end_time: datetime, description='', location='', hyperlink=''):
     Appointment.objects.create(name=name, user=user, description=description, start_time=int(datetime.timestamp(start_time)), end_time=int(datetime.timestamp(end_time)), location=location, hyperlink=hyperlink)
@@ -48,6 +48,7 @@ def createAppointment(name, user: User, start_time: datetime, end_time: datetime
 
 i_ap ={'id':0, 'name':1, 'description':2, 'end_time':3, 'location':4, 'hyperlink':5, 'user_id':6, 'start_time':7}
 def editAppointment(appointment, name=None, start_time=None, end_time=None, description=None, location=None, hyperlink=None):
+    conn = sqlite3.connect('db.sqlite3')
     if name is None:
         name = appointment[i_ap['name']]
     if start_time is None:
@@ -62,31 +63,39 @@ def editAppointment(appointment, name=None, start_time=None, end_time=None, desc
         location = appointment[i_ap['location']]
     c = conn.cursor()
     c.execute('UPDATE scheduling_appointment SET name = ?, start_time = ?, end_time = ?, description = ?, location = ?, hyperlink = ? WHERE id = ?;', (name, start_time, end_time, description, location, hyperlink, appointment.id))
-    c.close()
+    conn.commit()
+    conn.close()
 
 def returnAppointmentsUser(start_time: datetime, end_time: datetime, user: User, full_ap=False):
+    conn = sqlite3.connect('db.sqlite3')
     c = conn.cursor()
+    if type(start_time) == int:
+        pass
+    else:
+        start_time = int(start_time.timestamp())
+        end_time = int(end_time.timestamp())
     try:
         id = user.id
     except AttributeError:
         id = user
     if full_ap:
-        c.execute(f'SELECT * FROM scheduling_appointment WHERE ((start_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())}) OR (end_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())})) AND user_id = {int(id)};')
+        c.execute(f'SELECT * FROM scheduling_appointment WHERE ((start_time BETWEEN {start_time} AND {end_time}) OR (end_time BETWEEN {start_time} AND {end_time})) AND user_id = {int(id)};')
     else:
-        c.execute(f'SELECT start_time, end_time, user_id FROM scheduling_appointment WHERE ((start_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())}) OR (end_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())})) AND user_id = {int(id)};')
+        c.execute(f'SELECT start_time, end_time, user_id FROM scheduling_appointment WHERE ((start_time BETWEEN {start_time} AND {end_time}) OR (end_time BETWEEN {start_time} AND {end_time})) AND user_id = {int(id)};')
     data = c.fetchall()
-    c.close()
+    conn.close()
     return data
 
 # A function to return all TIMES (only the start and end time of existing appointments) for a certain team within a certain timeframe
 # Can be used for availability checking
 def returnAppointmentsTeam(start_time: datetime, end_time: datetime, team: Team):
+    conn = sqlite3.connect('db.sqlite3')
     c = conn.cursor()
     #query = f"SELECT start_time, end_time, user_id FROM (SELECT A.start_time , A.end_time, A.user_id  FROM scheduling_appointment A, scheduling_membership M WHERE M.user_id = A.user_id AND M.team_id = {team}) WHERE start_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())} OR end_time BETWEEN {int(start_time.timestamp())} AND {int(end_time.timestamp())} ORDER BY start_time ASC;"
     query = f"SELECT user_id from scheduling_membership WHERE team_id = {team};"
     c.execute(query)
     users = c.fetchall()
-    c.close()
+    conn.close()
     appointments = []
     for user in users:
         appointments_user = returnAppointmentsUser(start_time, end_time, user[0])
@@ -229,15 +238,17 @@ data_content = """
 """
 
 def get_start_and_end_timestamp(week_number, year=2023):
-    start_date = datetime.strptime(f'{year}-W{week_number}-1', '%Y-W%U-%w')
+    start_date = datetime.strptime(f'{year}-{week_number}-1', '%Y-%W-%w')
     end_date = start_date + timedelta(days=7)
     start_timestamp = int(start_date.timestamp())
     end_timestamp = int(end_date.timestamp())
     return start_timestamp, end_timestamp
 
-def retrieveAppointmentsWeek(weeknumber, user):
-    start_timestamp, end_timestamp = get_start_and_end_timestamp(datetime.now().year, weeknumber)
-    appointments = returnAppointmentsUser(start_timestamp, end_timestamp, user)
+def retrieveAppointmentsWeek(weeknumber, user, year=None):
+    if year is None:
+        year = datetime.now().year
+    start_timestamp, end_timestamp = get_start_and_end_timestamp(week_number=weeknumber, year=year)
+    appointments = returnAppointmentsUser(start_timestamp, end_timestamp, user, full_ap=True)
     return appointments, start_timestamp, end_timestamp
 
 
