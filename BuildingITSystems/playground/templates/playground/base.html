@@ -1,0 +1,84 @@
+{% load static%}
+<!-- templates/base.html-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"
+        <title>{% block title%}Scheduling{% endblock %} </title>
+
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="{% static 'theme/css/styles.css' %}" rel="stylesheet" />
+        <link href="{% static 'css/main.css' %}" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        
+
+        
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+  
+    </head>
+    <body>
+        {% include 'playground/navbar.html'%}
+        <main id="main">
+            {% block content%}
+            {% endblock %}
+        </main>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="{% static 'theme/js/scripts.js' %}"></script>
+    </body>
+    <footer>
+        <section class="footer-testing">
+            <div class="footer-clean">
+              <footer>
+                  <div class="container">
+                      <div class="row justify-content-center">
+                          <div class="col-sm-4 col-md-3 item">
+                              <h3>Services</h3>
+                              <ul>
+                                  <li><a href="#">Become a supporter</a></li>
+                                  <li><a href="#">Development</a></li>
+                                  <li><a href="#">Scheduling</a></li>
+                              </ul>
+                          </div>
+                          <div class="col-sm-4 col-md-3 item">
+                              <h3>About</h3>
+                              <ul>
+                                  <li><a href="#">Company</a></li>
+                                  <li><a href="#">Team</a></li>
+                                  <li><a href="#">Legacy</a></li>
+                              </ul>
+                          </div>
+                          <div class="col-sm-4 col-md-3 item">
+                              <h3>Upcoming events</h3>
+                              <ul>
+                                  <li><a href="#">Chatting system</a></li>
+                                  <li><a href="#">New collabs</a></li>
+                                  <li><a href="#">Benefits</a></li>
+                              </ul>
+                          </div>
+                          <div class="col-lg-3 item social"><a href="#"><i class="icon ion-social-facebook"></i></a><a href="#"><i class="icon ion-social-twitter"></i></a><a href="#"><i class="icon ion-social-snapchat"></i></a><a href="#"><i class="icon ion-social-instagram"></i></a>
+                              <p class="copyright">Scheduling © 2022</p>
+                          </div>
+                      </div>
+                  </div>
+              </footer>
+            </div>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+            </section>
+    </footer>
+</html>
+</br>
+
+
+
