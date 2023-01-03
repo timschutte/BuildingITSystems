@@ -1,7 +1,8 @@
 from django.db import models
-from datetime import datetime
+from datetime import datetime, timedelta
 import sqlite3
-
+from django.conf import settings
+settings.configure()
 
 class User(models.Model):
     id = models.AutoField(primary_key=True)
@@ -126,3 +127,133 @@ def availabilityPercentageTeam(start_time: datetime, end_time: datetime, team: T
         appointments_user = deleteOverlap(appointments_user)
         availability = substractAvailabilityUser(availability, appointments_user, team_percentage)
     return availability
+
+
+html_appointment = """
+            <li class="cd-schedule__event">
+              <a data-start="{start_time}" data-end="{end_time}" data-content="{description}" data-event="event-1" href="#0">
+                <em class="cd-schedule__name">{name}</em>
+              </a>
+            </li>
+"""
+html_day = """
+        <li class="cd-schedule__group">
+          <div class="cd-schedule__top-info"><span>{day}</span></div>
+  
+          <ul>
+            {appointments}
+          </ul>
+        </li>
+"""
+
+
+html_week = """
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>document.getElementsByTagName("html")[0].className += " js";</script>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <title>Schedule Template | CodyHouse</title>
+</head>
+<body>
+  <header class="cd-main-header text-center flex flex-column flex-center">
+    <p class="margin-top-md margin-bottom-xl">👈 <a class="cd-article-link" href="https://codyhouse.co/gem/schedule-template">Article &amp; Download</a></p>
+
+    <h1 class="text-xl">Schedule Template</h1>
+  </header>
+
+  <div class="cd-schedule cd-schedule--loading margin-top-lg margin-bottom-lg js-cd-schedule">
+    <div class="cd-schedule__timeline">
+      <ul>
+        <li><span>09:00</span></li>
+        <li><span>09:30</span></li>
+        <li><span>10:00</span></li>
+        <li><span>10:30</span></li>
+        <li><span>11:00</span></li>
+        <li><span>11:30</span></li>
+        <li><span>12:00</span></li>
+        <li><span>12:30</span></li>
+        <li><span>13:00</span></li>
+        <li><span>13:30</span></li>
+        <li><span>14:00</span></li>
+        <li><span>14:30</span></li>
+        <li><span>15:00</span></li>
+        <li><span>15:30</span></li>
+        <li><span>16:00</span></li>
+        <li><span>16:30</span></li>
+        <li><span>17:00</span></li>
+        <li><span>17:30</span></li>
+        <li><span>18:00</span></li>
+      </ul>
+    </div> <!-- .cd-schedule__timeline -->
+  
+    <div class="cd-schedule__events">
+      <ul>
+        {days}
+      </ul>
+    </div>
+  
+    <div class="cd-schedule-modal">
+      <header class="cd-schedule-modal__header">
+        <div class="cd-schedule-modal__content">
+          <span class="cd-schedule-modal__date"></span>
+          <h3 class="cd-schedule-modal__name"></h3>
+        </div>
+  
+        <div class="cd-schedule-modal__header-bg"></div>
+      </header>
+  
+      <div class="cd-schedule-modal__body">
+        <div class="cd-schedule-modal__event-info"></div>
+        <div class="cd-schedule-modal__body-bg"></div>
+      </div>
+  
+      <a href="#0" class="cd-schedule-modal__close text-replace">Close</a>
+    </div>
+  
+    <div class="cd-schedule__cover-layer"></div>
+  </div> <!-- .cd-schedule -->
+
+  <script src="assets/js/util.js"></script> <!-- util functions included in the CodyHouse framework -->
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
+"""
+
+data_content = """
+<div class="cd-schedule-modal__event-info">
+	<div>{description}</div>
+</div>
+"""
+
+def get_start_and_end_timestamp(week_number, year=2023):
+    start_date = datetime.strptime(f'{year}-W{week_number}-1', '%Y-W%U-%w')
+    end_date = start_date + timedelta(days=7)
+    start_timestamp = int(start_date.timestamp())
+    end_timestamp = int(end_date.timestamp())
+    return start_timestamp, end_timestamp
+
+def retrieveAppointmentsWeek(weeknumber, user):
+    start_timestamp, end_timestamp = get_start_and_end_timestamp(datetime.now().year, weeknumber)
+    appointments = returnAppointmentsUser(start_timestamp, end_timestamp, user)
+    return appointments, start_timestamp, end_timestamp
+
+
+def weekscheduleHTML(weeknumber, user, year=2023):
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    html = ''
+    appointments, start_timestamp, end_timestamp = retrieveAppointmentsWeek(weeknumber, user, year=year)
+    for i in range(7):
+        html_day = ''
+        for appointment in appointments:
+            if appointment[i_ap['start_time']].weekday() == i:
+                start = datetime.fromtimestamp(appointment[i_ap['start_time']]).strftime('%H:%M')
+                end = datetime.fromtimestamp(appointment[i_ap['end_time']]).strftime('%H:%M')
+                html_day += html_appointment.format(start_time=start, end_time=end, name=appointment[i_ap['name']], appointment=data_content.format(description=appointment[i_ap['description']]))
+        day = datetime.fromtimestamp(datetime.now().timestamp()) + timedelta(days=i)
+        day = day.strftime('%m-%d')
+        html += html_day.format(day=days[i] + f' {day}', appointments=html_day)
+    html = html_week.format(days=html)
+    return html
