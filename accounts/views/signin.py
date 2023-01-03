@@ -24,6 +24,6 @@ class SignInView(View):
             user = authenticate(email=email, password=password)
             if user:
                 login(request, user)
-                return redirect("http://127.0.0.1:8000/schedule/")
+                return redirect("http://127.0.0.1:8000/calendar/")
         context = {"form": forms}
         return render(request, self.template_name, context)
