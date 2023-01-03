@@ -49,59 +49,50 @@
                 title: 'Repeating Event',
                 start: '2023-01-09T16:00:00'
               },
-              {
-                id: 999,
-                title: 'Repeating Event',
-                start: '2020-01-16T16:00:00'
-              },
-              {
-                title: 'Conference',
-                start: '2020-01-11',
-                end: '2020-01-13'
-              },
-              {
-                title: 'Meeting',
-                start: '2020-01-12T10:30:00',
-                end: '2020-01-12T12:30:00'
-              },
-              {
-                title: 'Lunch',
-                start: '2020-01-12T12:00:00'
-              },
-              {
-                title: 'Meeting',
-                start: '2020-01-12T14:30:00'
-              },
-              {
-                title: 'Happy Hour',
-                start: '2020-01-12T17:30:00'
-              },
-              {
-                title: 'Dinner',
-                start: '2020-01-12T20:00:00'
-              },
-              {
-                title: 'Birthday Party',
-                start: '2020-01-13T07:00:00'
-              },
-              {
-                title: 'Click for Google',
-                url: 'http://google.com/',
-                start: '2020-01-28'
-              }
             ]
           });
       });
     </script>
 <!-- Event form modal -->
 <div class="modal fade" id="event-modal" tabindex="-1" role="dialog" aria-labelledby="event-modal-label" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <form id="event-form">
-          {% csrf_token %}
-          <div class="modal-header">
-            <h5 class="modal-title" id="event-modal-label">Edit Event</h5>
-            <button type="button" class="close" data
-  </body>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="event-form">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="event-modal-label">Edit Event</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id" value="">
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" name="title" value="" required>
+          </div>
+          <div class="form-group">
+            <label for="start">Start</label>
+            <input type="date" class="form-control" id="start" name="start" value="" required>
+          </div>
+          <div class="form-group">
+            <label for="end">End</label>
+            <input type="date" class="form-control" id="end" name="end" value="" required>
+          </div>
+          <div class="form-group">
+            <label for="location">Location</label>
+            <input type="text" class="form-control" id="location" name="location" value="">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+    
+</body>
 </html>
 {%endblock%}
