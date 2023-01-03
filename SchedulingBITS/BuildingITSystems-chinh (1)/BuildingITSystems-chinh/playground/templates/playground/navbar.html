@@ -1,0 +1,36 @@
+{% url 'index' as index_url %}
+{% url 'schedule' as schedule_url %}
+{% url 'about' as about_url %}
+{% url 'login' as login_url %}
+
+<nav class="navbar navbar-expand-lg text-uppercase fixed-top" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">WeSchedule</a>
+        <button class="navbar-toggler text-uppercase font-weight-bold hs-bg-primary text-white rounded" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            Menu
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3  {% if request.path == index_url %} active {% endif %}" href="http://127.0.0.1:8000">Home</a></li>
+                
+                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3  {% if request.path == schedule_url %} active {% endif %}" href="http://127.0.0.1:8000/schedule/">Schedule</a></li>
+                
+                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3  {% if request.path == about_url %} active {% endif %}" href="http://127.0.0.1:8000/about/">About Us</a></li>
+
+                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3  {% if request.path == login_url %} active {% endif %}" href="http://127.0.0.1:8000/login/">Login</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+{% comment %} <nav>
+    {% url 'index' as index_url %}
+    <span>{% if request.path == index_url %} Home {% else %}<a href = "{% url 'index' %}">Home</a>{% endif %}</span>
+    <span><a href = "{% url 'profile' %}">Profile</a></span>
+    {% url 'schedule' as schedule_url %}
+    <span>{% if request.path == schedule_url %} Schedule {% else %}<a href = "{% url 'schedule' %}">Schedules</a>{% endif%}</span>
+    {% url 'messages' as messages_url %}
+    <span>{% if request.path == messages_url %} Messages {% else %}<a href = "{% url 'messages' %}">Messages</a>{% endif%}</span>
+</nav> {% endcomment %}
