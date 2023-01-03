@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
 
 # Create views here
 
 
-def index(response):
-    return render(response, "playground/index.html", {})
+def index(request):
+    return render(request, "playground/index.html", {})
 
 
 def messages(request):
@@ -30,5 +29,7 @@ def test(request):
 def footer(request):
     return render(request, 'playground/footer.html')
 
+def calender(request):
+    return render(request, 'playground/calender.html')
 
 

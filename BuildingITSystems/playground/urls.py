@@ -10,6 +10,7 @@ urlpatterns = [
     path('about/', views.about, name="about"),
     path('test', views.test, name="test"),
     path('footer', views.footer, name="footer"),
+    path('calender', views.calender, name='calender'),
  
 
 ]
