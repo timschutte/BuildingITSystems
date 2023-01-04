@@ -18,8 +18,8 @@
 
   <body>
     <div id="calendar"></div>
-    {% comment %} //  retrieving events from the database {% endcomment %}
-    {% comment %} {% if user.is_authenticated %}
+    //  retrieving events from the database
+    {% if user.is_authenticated %}
     
     <py-script>
       import sys, os
@@ -35,7 +35,7 @@
       events = models.returnAppointmentsUser(start_time=start, end_time=end, user=userid, full_ap=True, as_dict=True)
       pyscript.write('events', events)
     </py-script>
-    {% endif %} {% endcomment %}
+    {% endif %}
 
     <script>
       $(document).ready(function() {
@@ -59,65 +59,61 @@
                 $('#event-modal input[name="end"]').val(event.end.format());
                 $('#event-modal input[name="location"]').val(event.location);
               },
-              events: [
-              {
-                title: 'All Day Event',
-                start: '2023-01-01'
-              },
-              {
-                title: 'Long Event',
-                start: '2023-01-07',
-                end: '2023-01-10'
-              },
-              {
-                id: 999,
-                title: 'Repeating Event',
-                start: '2023-01-09T16:00:00'
-              },
-              {
-                id: 999,
-                title: 'Repeating Event',
-                start: '2023-01-16T16:00:00'
-              },
-              {
-                title: 'Conference',
-                start: '2023-01-11',
-                end: '2023-01-13'
-              },
-              {
-                title: 'Meeting',
-                start: '2023-01-12T10:30:00',
-                end: '2023-01-12T12:30:00'
-              },
-              {
-                title: 'Lunch',
-                start: '2023-01-12T12:00:00'
-              },
-              {
-                title: 'Meeting',
-                start: '2023-01-12T14:30:00'
-              },
-              {
-                title: 'Happy Hour',
-                start: '2023-01-12T17:30:00'
-              },
-              {
-                title: 'Dinner',
-                start: '2023-01-12T20:00:00'
-              },
-              {
-                title: 'Birthday Party',
-                start: '2023-01-13T07:00:00'
-              },
-              {
-                title: 'Click for Google',
-                url: 'http://google.com/',
-                start: '2023-01-28'
-              }
-            ]
+            events: pyscript.runtime.globals.get('events')
+            // [
+            //   {
+            //     title: 'All Day Event',
+            //     start: '2023-01-01'
+            //   },
+            //   {
+            //     id: 999,
+            //     title: 'Repeating Event',
+            //     start: '2023-01-09T16:00:00'
+            //   },
+            //   {
+            //     id: 999,
+            //     title: 'Repeating Event',
+            //     start: '2020-01-16T16:00:00'
+            //   },
+            //   {
+            //     title: 'Conference',
+            //     start: '2020-01-11',
+            //     end: '2020-01-13'
+            //   },
+            //   {
+            //     title: 'Meeting',
+            //     start: '2020-01-12T10:30:00',
+            //     end: '2020-01-12T12:30:00'
+            //   },
+            //   {
+            //     title: 'Lunch',
+            //     start: '2020-01-12T12:00:00'
+            //   },
+            //   {
+            //     title: 'Meeting',
+            //     start: '2020-01-12T14:30:00'
+            //   },
+            //   {
+            //     title: 'Happy Hour',
+            //     start: '2020-01-12T17:30:00'
+            //   },
+            //   {
+            //     title: 'Dinner',
+            //     start: '2020-01-12T20:00:00'
+            //   },
+            //   {
+            //     title: 'Birthday Party',
+            //     start: '2020-01-13T07:00:00'
+            //   },
+            //   {
+            //     title: 'Click for Google',
+            //     url: 'http://google.com/',
+            //     start: '2020-01-28'
+            //   }
+            // ]
           });
-        });
-      </script>
+      });
+    </script>
 <!-- Event form modal -->
 <div class="modal fade" id="event-modal" tabindex="-1" role="dialog" aria-labelledby="event-modal-label" aria-hidden="true">
   <div class="modal-dialog" role="document">
