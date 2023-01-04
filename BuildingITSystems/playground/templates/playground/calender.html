@@ -19,7 +19,8 @@
   <body>
     <div id="calendar"></div>
     //  retrieving events from the database
-    {{% if user.is_authenticated %}}
+    {% if user.is_authenticated %}
+    
     <py-script>
       import sys, os
       current = os.path.dirname(os.path.realpath(__file__))
@@ -34,7 +35,8 @@
       events = models.returnAppointmentsUser(start_time=start, end_time=end, user=userid, full_ap=True, as_dict=True)
       pyscript.write('events', events)
     </py-script>
-    {{% endif %}}
+    {% endif %}
+
     <script>
       $(document).ready(function() {
         $('#calendar').fullCalendar({
@@ -57,7 +59,6 @@
                 $('#event-modal input[name="end"]').val(event.end.format());
                 $('#event-modal input[name="location"]').val(event.location);
               },
-<<<<<<< HEAD
             events: pyscript.runtime.globals.get('events')
             // [
             //   {
@@ -110,34 +111,11 @@
             //     start: '2020-01-28'
             //   }
             // ]
-=======
-            events: [
-              {
-                title: 'All Day Event',
-                start: '2023-01-01'
-              },
-              {
-                id: 999,
-                title: 'Repeating Event',
-                start: '2023-01-09T16:00:00'
-              },
-            ]
->>>>>>> 6e87186cd0119085e85c97ab7f01ce6496a3f569
           });
       });
     </script>
 <!-- Event form modal -->
 <div class="modal fade" id="event-modal" tabindex="-1" role="dialog" aria-labelledby="event-modal-label" aria-hidden="true">
-<<<<<<< HEAD
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <form id="event-form">
-          {% csrf_token %}
-          <div class="modal-header">
-            <h5 class="modal-title" id="event-modal-label">Edit Event</h5>
-            <button type="button" class="close" data="">close</button>
-  </body>
-=======
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form id="event-form">
@@ -177,6 +155,5 @@
 </div>
     
 </body>
->>>>>>> 6e87186cd0119085e85c97ab7f01ce6496a3f569
 </html>
 {%endblock%}
