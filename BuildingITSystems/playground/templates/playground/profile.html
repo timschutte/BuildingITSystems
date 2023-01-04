@@ -1,0 +1,14 @@
+{% extends 'playground/base.html' %}
+
+{% load static%}
+
+{% block title%} Profile {% endblock %}
+
+{% block content%}
+<h1>
+    Profile
+    {{request.user.username}}
+</h1>
+
+<h3> {{request.user.username}} </h3>
+{% endblock %}
