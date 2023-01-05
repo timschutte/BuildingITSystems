@@ -1,0 +1,159 @@
+
+
+{% block title%} Calender {% endblock %}
+
+{% block content %}
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.js"></script>
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <style>
+        
+    </style>
+  </head>
+
+  <body>
+    <div id="calendar"></div>
+    //  retrieving events from the database
+    {% if user.is_authenticated %}
+    
+    <py-script>
+      import sys, os
+      current = os.path.dirname(os.path.realpath(__file__))
+      parent = os.path.dirname(current)
+      parent = os.path.dirname(parent)
+      sys.path.append(parent)
+      from datetime import datetime, timezone, timedelta
+      from playground import models
+      start = datetime.now() - timedelta(days=100)
+      end = datetime.now() + timedelta(days=100)
+      userid = {{ user.id }}
+      events = models.returnAppointmentsUser(start_time=start, end_time=end, user=userid, full_ap=True, as_dict=True)
+      pyscript.write('events', events)
+    </py-script>
+    {% endif %}
+
+    <script>
+      $(document).ready(function() {
+        $('#calendar').fullCalendar({
+            header: {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'month,agendaWeek,agendaDay'
+            },
+
+            navLinks: true, // can click day/week names to navigate views
+            editable: true,
+            eventLimit: true, // allow "more" link when too many events
+            eventClick: function(event) {
+                // Open the event form modal
+                $('#event-modal').modal('show');
+                // Populate the event form fields with the event data
+                $('#event-modal input[name="id"]').val(event.id);
+                $('#event-modal input[name="title"]').val(event.title);
+                $('#event-modal input[name="start"]').val(event.start.format());
+                $('#event-modal input[name="end"]').val(event.end.format());
+                $('#event-modal input[name="location"]').val(event.location);
+              },
+            events: pyscript.runtime.globals.get('events')
+            // [
+            //   {
+            //     title: 'All Day Event',
+            //     start: '2023-01-01'
+            //   },
+            //   {
+            //     id: 999,
+            //     title: 'Repeating Event',
+            //     start: '2023-01-09T16:00:00'
+            //   },
+            //   {
+            //     id: 999,
+            //     title: 'Repeating Event',
+            //     start: '2020-01-16T16:00:00'
+            //   },
+            //   {
+            //     title: 'Conference',
+            //     start: '2020-01-11',
+            //     end: '2020-01-13'
+            //   },
+            //   {
+            //     title: 'Meeting',
+            //     start: '2020-01-12T10:30:00',
+            //     end: '2020-01-12T12:30:00'
+            //   },
+            //   {
+            //     title: 'Lunch',
+            //     start: '2020-01-12T12:00:00'
+            //   },
+            //   {
+            //     title: 'Meeting',
+            //     start: '2020-01-12T14:30:00'
+            //   },
+            //   {
+            //     title: 'Happy Hour',
+            //     start: '2020-01-12T17:30:00'
+            //   },
+            //   {
+            //     title: 'Dinner',
+            //     start: '2020-01-12T20:00:00'
+            //   },
+            //   {
+            //     title: 'Birthday Party',
+            //     start: '2020-01-13T07:00:00'
+            //   },
+            //   {
+            //     title: 'Click for Google',
+            //     url: 'http://google.com/',
+            //     start: '2020-01-28'
+            //   }
+            // ]
+          });
+      });
+    </script>
+<!-- Event form modal -->
+<div class="modal fade" id="event-modal" tabindex="-1" role="dialog" aria-labelledby="event-modal-label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="event-form">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="event-modal-label">Edit Event</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id" value="">
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" name="title" value="" required>
+          </div>
+          <div class="form-group">
+            <label for="start">Start</label>
+            <input type="date" class="form-control" id="start" name="start" value="" required>
+          </div>
+          <div class="form-group">
+            <label for="end">End</label>
+            <input type="date" class="form-control" id="end" name="end" value="" required>
+          </div>
+          <div class="form-group">
+            <label for="location">Location</label>
+            <input type="text" class="form-control" id="location" name="location" value="">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+    
+</body>
+</html>
+{%endblock%}

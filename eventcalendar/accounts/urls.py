@@ -1,0 +1,21 @@
+# /*************************************************************** 
+# *Title: Event Calendar 
+# *Author: sajib1066 
+# *Date: 5 July 2020 
+# *Code version: V79 
+# *Availability: https://github.com/sajib1066/event-calendar (Accessed 14 December 2022) 
+# ****************************************************************/
+
+from django.urls import path
+
+from accounts import views
+
+app_name = "accounts"
+
+
+urlpatterns = [
+    path("signup/", views.SignUpView.as_view(), name="signup"),
+    path("signin/", views.SignInView.as_view(), name="signin"),
+    path("signout/", views.signout, name="signout"),
+    path("", views.SignInView.as_view(), name="signin"),
+]

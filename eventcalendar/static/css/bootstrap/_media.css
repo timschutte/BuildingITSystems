@@ -1,0 +1,20 @@
+/* ************************************************************** 
+*Title: Event Calendar 
+*Author: sajib1066 
+*Date: 5 July 2020 
+*Code version: V79 
+*Availability: https://github.com/sajib1066/event-calendar (Accessed 14 December 2022) 
+*************************************************************** */
+
+.media {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+  -ms-flex-align: start;
+  align-items: flex-start; }
+
+.media-body {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1; }
